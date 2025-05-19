@@ -26,6 +26,49 @@
 from mega.utils.constant cimport PI_NUMBER, SQRT_PI
 from libc.math cimport sqrt, exp, sin, pow
 
+def prime_factors(int n, bint unique=False):
+    """"
+    return prime factor of positive integer n
+
+    Parameter:
+        n (int): integer to be factorized, must greater than zero
+        unique (bool): if True, return only distinct prime factors
+        
+    Return:
+        list[int]: list of prime factor of `n`, sorted in increasing order
+
+    Example:
+    >>> prime_factors(60)
+    [2, 2, 3, 5]
+    >>> prime_factors(13, unique=True)
+    [13]
+    """
+    if n <= 0:
+        raise ValueError("only positive integer are acc")
+    cdef int i = 2
+    cdef list factors = []
+    
+    # trie division algorithm
+    while i * i <= n:
+        while n % i == 0:
+            # append current factor
+            factors.append(i)
+            # divide n by the factor
+            n //= i
+        # move to next candidate divisor
+        i += 1
+
+    # remaining prime factors
+    if n > 1:
+        factors.append(n)
+    # remove duplicate if unique flag is set
+    if unique:
+        seen = set()
+        # using list comprehension to preserve order while removing duplicate
+        return [x for x in factors if not (x in seen or seen.add(x))]
+    else:
+        return factors
+
 cpdef double gamma(double point):
     """
     computing gamma function Γ(point) for real-valued `point > 0`
@@ -179,3 +222,51 @@ cpdef int euler_phi(int n) except -1:
         result -= result // n
 
     return result
+
+cpdef long jordan_totient(int n, int k) except -1:
+    """
+    compute jordan totient function which generalizes euler totient function
+
+    Parameter:
+        n (int): positive integer 
+        k (int): non-negative integer exponent
+
+    Return:
+        (long): value of totient function
+
+    Example:
+    >>> jordan_totient(6, 1)
+    2
+    >>> jordan_totient(10, 2)
+    80
+    """
+    if n <= 0:
+        raise ValueError("input `n` must positive integers")
+    if k < 0:
+        raise ValueError("exponent `k` must non-negative integer")
+
+    if k == 0:
+        return 0
+
+    if n == 1:
+        return 1
+
+    # acompute n^k
+    cdef long res = <long>(pow(n, k))
+    # get unique prime factor of n
+    cdef list primes = prime_factors(n)
+    # apply the formula for each prime factor
+    cdef int p
+    cdef long pk, numerator, denominator
+
+    for p in primes:
+        # compute p^k
+        pk = <long>(pow(p, k))
+        # compute (p^k - 1) / p^k as two separate integer operations
+        numerator = pk - 1
+        denominator = pk
+        # multiply result by numerator / denominator using integer
+        # arithmetic to make sure division happens before multiplication
+        # to preventing overflow
+        res = res // denominator * numerator
+    return res
