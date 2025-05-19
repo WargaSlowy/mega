@@ -13,6 +13,11 @@ ext = [
         ["mega/op/function.pyx"],
         include_dirs=[np.get_include()],
     ),
+    Extension(
+        "mega.op.arithmethic",
+        ["mega/op/arithmethic.pyx"],
+        include_dirs=[np.get_include()],
+    ),
 ]
 
 os.makedirs("mega/utils", exist_ok=True)

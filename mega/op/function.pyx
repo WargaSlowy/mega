@@ -24,7 +24,7 @@
 # mega/op/gamma.pyx
 
 from mega.utils.constant cimport PI_NUMBER, SQRT_PI
-from libc.math cimport sqrt, exp, log, sin, pow
+from libc.math cimport sqrt, exp, sin, pow
 
 cpdef double gamma(double point):
     """
