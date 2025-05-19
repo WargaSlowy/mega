@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools", "wheel", "cython", "numpy"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "mega"
 version = "0.1.0"

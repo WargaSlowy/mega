@@ -25,7 +25,8 @@ os.makedirs("mega/op", exist_ok=True)
 
 setup(
     name="mega number utils",
+    version="1.0",
     packages=find_packages(),
     ext_modules=cythonize(ext, language_level=3),
-    include_dirs=[np.get_include()]
+    include_dirs=[np.get_include()],
 )
