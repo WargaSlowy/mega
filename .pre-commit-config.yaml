@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: clean-project
+        name: clean any unused files
+        entry: bash ./build.sh clean
+        language: system
+        pass_filenames: false

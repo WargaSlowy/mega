@@ -5,8 +5,8 @@ make_libs () {
 }
 
 clean_project() {
-  find . -type f $ -name "*.so" -o -name "*.c" -o -name "*.pyc" $ -exec rm -f {} +
-find . -type d -name "__pycache__" -exec rm -rf {} +
+  find . -type f \( -name "*.so" -o -name "*.c" -o -name "*.pyc" \) -exec rm -f {} +
+  find . -type d -name "__pycache__" -exec rm -rf {} +
 }
 
 if [ "$1" == "make" ]; then
