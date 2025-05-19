@@ -72,6 +72,7 @@ cpdef double gamma(double point):
     if point == 1.0 or point == 2.0:
         return 1.0
 
+    # factorial shorcut for exact integer input
     if z == <int>z:
         n  = <int>z;
         fact = 1.0
@@ -79,6 +80,7 @@ cpdef double gamma(double point):
             fact *= i
         return fact
 
+    # duplicate check to avoid confusion
     if point == int(point):
         n = <int>point
         result = 1.0
@@ -86,9 +88,12 @@ cpdef double gamma(double point):
             result *= i
         return result
 
+    # reset working variable
     z = point
     y = z
     
+    # apply reflection formula
+    # this allow to compute (for small value)
     neg = 0
     if z < 0.5:
         y = 1.0 - z
@@ -98,6 +103,8 @@ cpdef double gamma(double point):
 
     x = 0.99999999999980993
 
+    # coefficient from lanczos approximation with g=7 and n=8 terms
+    # theres are precomputed to balance accuracy and performance
     cdef double[8] LANCZOS_COEFF = [
         676.5203681218851,
         -1259.1392167224028,
@@ -108,10 +115,67 @@ cpdef double gamma(double point):
         9.9843695780195716e-6,
         1.5056327351493116e-7
     ]
+    
+    # accumulate terms of the series
     for i in range(8):
         x += LANCZOS_COEFF[i] / (y + i)
+    # compute intermediate value for the final formula
     t = y + 7.5
     tmp = sqrt(2.0 * PI_NUMBER) * x * pow(t, y - 0.5) * exp(-t)
+    # apply reflection formula if needed
     if neg:
         return PI_NUMBER / (sin(PI_NUMBER * z) * tmp)
     return tmp
+
+cpdef int euler_phi(int n) except -1:
+    """
+    compute euler totients function which couynt the number of integers
+    less than or equal to `n` that are coprime to `n`
+
+    formula:
+    φ(n) = n × ∏(p|n) (1 - 1/p)
+
+    where the product is over all distinct prime factors p of n
+
+    Parameter:
+        n (int): positive integer greater than 0
+
+    Return:
+        (int): value of euler totient function
+
+    Example:
+    >>> euler_phi(10)
+    4
+    >>> euler_phi(100)
+    40
+    """
+    if n <= 0:
+        raise ValueError("only positive number will accept")
+
+    cdef int result = n
+    cdef int i = 2 # start check from smallest prime factor
+
+    if n % 2 == 0:
+        # apply the formula
+        # result = result * (1 - 1 / 2) = result - result // 2
+        result -= result // 2
+        # remove all occurrences of 2 from n
+        while n % 2 == 0:
+            n //= 2
+
+    i = 3
+    while i * i <= n:
+        if n % i == 0:
+            # apply the formula
+            # result = result * (1 - 1 / i) = result - result // i
+            result -= result // i
+            # remove all occurence of current prime factor i
+            while n % i == 0:
+                n //= i
+        i += 2
+
+    # if remaining n is a prime > 2, apply last adjustment
+    if n > 1:
+        result -= result // n
+
+    return result

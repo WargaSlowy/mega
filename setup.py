@@ -9,8 +9,8 @@ ext = [
         ["mega/utils/constant.pyx"],
     ),
     Extension(
-        "mega.op.gamma",
-        ["mega/op/gamma.pyx"],
+        "mega.op.function",
+        ["mega/op/function.pyx"],
         include_dirs=[np.get_include()],
     ),
 ]
