@@ -69,6 +69,28 @@ def prime_factors(int n, bint unique=False):
     else:
         return factors
 
+cpdef double haversine(double theta) except -1:
+    """
+    compute the haversine function of an angle θ
+
+    formula haversine function:
+    haversine(θ) = sin^2(θ/2) = (1 - cos(θ)) / 2
+
+    Parameter:
+        theta (double): angle in radian
+
+    Return:
+        (double): value of haversine(theta)
+
+    Example:
+    >>> haversine(0)
+    0.0
+    >>> haversine(3.14)
+    1.0
+    """
+    # cosine based definition for avoiding compute square root or power
+    return (1.0 - cos(theta)) / 2.0
+
 cpdef double gamma(double point):
     """
     computing gamma function Γ(point) for real-valued `point > 0`
