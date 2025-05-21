@@ -27,3 +27,38 @@ cdef double PI_NUMBER = 3.141592653589793238462643383279502884197
 cdef double EULER_NUMBER = 2.718281828459045235360287471352
 cdef double GAUSS_NUMBER = 0.8346268
 cdef double SQRT_PI = 1.772453850905516027298167483341145182
+
+cpdef unsigned long lucas_number(int n) except 0:
+    """
+    compute the nth lucas number using iterative
+
+    Parameter:
+        n (int): index in the lucas squence, must be non-negative integers
+
+    Return:
+        (unsigned long): the nth lucas number
+
+    Example:
+    >>> lucas_number(0)
+    2
+    >>> lucas_number(40)
+    228826127
+    """
+    if n < 0:
+        raise ValueError("index must be non negative number")
+
+    if n == 0:
+        return 2
+    elif n == 1:
+        return 1
+
+    cdef unsigned long prev = 2, curr = 1, next_val
+    cdef int i
+    
+    for i in range(2, n + 1):
+        next_val = prev + curr
+        # shifting previous value forward
+        prev = curr
+        # update current value for next iteration
+        curr = next_val
+    return curr
