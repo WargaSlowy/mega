@@ -170,59 +170,6 @@ cpdef double gamma(double point):
         return PI_NUMBER / (sin(PI_NUMBER * z) * tmp)
     return tmp
 
-cpdef int euler_phi(int n) except -1:
-    """
-    compute euler totients function which couynt the number of integers
-    less than or equal to `n` that are coprime to `n`
-
-    formula:
-    φ(n) = n × ∏(p|n) (1 - 1/p)
-
-    where the product is over all distinct prime factors p of n
-
-    Parameter:
-        n (int): positive integer greater than 0
-
-    Return:
-        (int): value of euler totient function
-
-    Example:
-    >>> euler_phi(10)
-    4
-    >>> euler_phi(100)
-    40
-    """
-    if n <= 0:
-        raise ValueError("only positive number will accept")
-
-    cdef int result = n
-    cdef int i = 2 # start check from smallest prime factor
-
-    if n % 2 == 0:
-        # apply the formula
-        # result = result * (1 - 1 / 2) = result - result // 2
-        result -= result // 2
-        # remove all occurrences of 2 from n
-        while n % 2 == 0:
-            n //= 2
-
-    i = 3
-    while i * i <= n:
-        if n % i == 0:
-            # apply the formula
-            # result = result * (1 - 1 / i) = result - result // i
-            result -= result // i
-            # remove all occurence of current prime factor i
-            while n % i == 0:
-                n //= i
-        i += 2
-
-    # if remaining n is a prime > 2, apply last adjustment
-    if n > 1:
-        result -= result // n
-
-    return result
-
 cpdef long jordan_totient(int n, int k) except -1:
     """
     compute jordan totient function which generalizes euler totient function
