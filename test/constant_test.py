@@ -32,6 +32,19 @@ LUCAS_VALUES: dict = {
     40: 228826127,
 }
 
+GOLDEN_RATIO_VALUE: dict = {
+    1: 2.0,
+    2: 1.5,
+    3: 1.6666666666666667,
+    4: 1.6,
+    5: 1.625,
+    10: 1.6179775280898876,
+    20: 1.6180339886754843,
+    30: 1.6180339887498948,
+}
+
+TRUE_PHI: float = (1 + (5 ** 0.5)) / 2
+
 def test_scalar_input_catalan_number() -> None:
     for i, expected in enumerate(CATALAN_VALUES):
         assert constant.catalan_number(i) == expected
@@ -52,3 +65,18 @@ def test_large_value_lucas_number() -> None:
     assert constant.lucas_number(20) == 15127
     assert constant.lucas_number(30) == 1860498
     assert constant.lucas_number(40) == 228826127
+
+def test_value_golden_ratio() -> None:
+    for iterations, expected in GOLDEN_RATIO_VALUE.items():
+        result = constant.golden_ratio(iterations)
+        assert abs(result - expected) < 1e-3, (
+            f"golden_ratio({iterations}) = {result}, expected {expected}"
+        )
+
+def test_coverage_to_phi_golden_ratio() -> None:
+    result = constant.golden_ratio()
+    assert abs(result - TRUE_PHI) < 1e-3
+
+def test_return_type_golden_ratio() -> None:
+    result = constant.golden_ratio()
+    assert isinstance(result, float)

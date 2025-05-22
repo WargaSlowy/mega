@@ -23,9 +23,12 @@
 # cython: language_level=3
 # mega/utils/constant.pyx
 
+from libc.math cimport sqrt
+
 cdef double PI_NUMBER = 3.141592653589793238462643383279502884197
 cdef double EULER_NUMBER = 2.718281828459045235360287471352
 cdef double GAUSS_NUMBER = 0.8346268
+cdef double TAU_NUMBERS = PI_NUMBER * 2;
 cdef double SQRT_PI = 1.772453850905516027298167483341145182
 
 cdef void mat_mult(unsigned long A[2][2], unsigned long B[2][2], unsigned long result[2][2]) except *:
@@ -166,3 +169,13 @@ cpdef long catalan_number(int n) except -1:
         # then divide by (i + 1) using integer division
         result = result * 2 * (2 * i - 1) // (i + 1)
     return result
+
+cpdef double golden_ratio(int iteration=30) except -1.0:
+    if iteration < 1:
+        raise ValueError("iteration must be at least 1")
+    cdef double phi = 1.0
+    cdef int i
+
+    for i in range(iteration):
+        phi = 1.0 + 1.0 / phi
+    return phi
