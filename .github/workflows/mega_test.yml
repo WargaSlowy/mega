@@ -1,0 +1,28 @@
+name: mega_test
+on: [push, pull_request]
+
+jobs:
+  mega-test:
+    name: python
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: install uva
+        uses: astral-sh/setup-uv@v5
+
+      - name: setup up python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: install libs
+        run: |
+          uv pip install -r requirements_dev.txt
+          uv run setup.py build_ext --inplace
+          uv pip install -e .
+          uv pip install .
+
+      - name: running testing
+        run: |
+          uv run pytest --verbose

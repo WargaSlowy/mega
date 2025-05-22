@@ -131,3 +131,38 @@ cpdef unsigned long lucas_number(int n) except 0:
         power = n - 1
         mat_pow(F, power, res)
         return 2 * res[0][1] + res[0][0]
+
+cpdef long catalan_number(int n) except -1:
+    """
+    compute the nth catalan number using efficient iterative algorithm
+
+    catalan number are squence natural numbers that appear in many combine
+    
+    nth catalan number is defined by recurrence relation:
+    C0  = 1
+    Cn+1 = (2(2n + 1) / (n + 2)) * Cn
+
+    Parameter:
+        n (int): index of catalan number to compute must be >= 0
+    
+    Return:
+        (long): nth catalan number
+
+    Example:
+    >>> catalan_number(0)
+    1
+    >>> catalan_numbr(4)
+    14
+    """
+    if n < 0:
+        raise ValueError("index must be a non-negative integer")
+
+    cdef long result = 1
+    cdef int i
+
+    # C(i) = C(i-1) * 2*(2i - 1) // (i + 1)
+    for i in range(1, n + 1):
+        # multiple current result by 2*(2i - 1) 
+        # then divide by (i + 1) using integer division
+        result = result * 2 * (2 * i - 1) // (i + 1)
+    return result
