@@ -50,6 +50,9 @@ cpdef long sigma_z(int n, int z) except -1:
     if z < 0:
         raise ValueError("exponent zeta must non-integers")
 
+    if not isinstance(n, int) and not isinstance(z, int):
+        raise TypeError("zeta and num must be int")
+
     cdef long total = 0 # store cumulative sum d^z
     cdef int i = 1 # current div candidate
     cdef int limit = <int>sqrt(n) # optimization: loop up to sqrt(n)
@@ -106,6 +109,9 @@ cpdef int euler_phi(int n) except -1:
     """
     if n <= 0:
         raise ValueError("only positive number will accept")
+
+    if not isinstance(n, int):
+        raise TypeError("only acc integer numbers")
 
     cdef int result = n
     cdef int i = 2 # start check from smallest prime factor

@@ -116,6 +116,11 @@ cpdef unsigned long lucas_number(int n) except 0:
     if n < 0:
         raise ValueError("index must be non negative number")
 
+    if not isinstance(n, int):
+        raise TypeError("num must be integer non-negative types")
+    elif isinstance(n, float):
+        n = <int>n
+
     if n == 0:
         return 2
     elif n == 1:
@@ -160,6 +165,11 @@ cpdef long catalan_number(int n) except -1:
     if n < 0:
         raise ValueError("index must be a non-negative integer")
 
+    if not isinstance(n, int):
+        raise TypeError("num must be integer, only acc integer non-negative")
+    elif isinstance(n, float):
+        n = <int>n
+
     cdef long result = 1
     cdef int i
 
@@ -171,11 +181,36 @@ cpdef long catalan_number(int n) except -1:
     return result
 
 cpdef double golden_ratio(int iteration=30) except -1.0:
+    """
+    compute golden ratio using interative continued fraction
+
+    golden ratio formula
+    
+    gold = 1 + 1 / gold
+
+    Parameter:
+        iteration (int): number of iteration to refining approximation
+                         default value is 30 - which is sufficient for 
+                         full floating point
+
+    Return:
+        (double): approximation of golden ratio after given number of iteration
+
+    Example:
+    >>> goldern_ratio(1)
+    2.0
+    >>> golden_ratio(5)
+    1.625
+    """
     if iteration < 1:
         raise ValueError("iteration must be at least 1")
+    
+    # initial approximation
     cdef double phi = 1.0
     cdef int i
 
+    # using continued fraction fromula
+    # phi = 1 + 1 / phi
     for i in range(iteration):
         phi = 1.0 + 1.0 / phi
     return phi
