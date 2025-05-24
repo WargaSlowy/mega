@@ -69,27 +69,80 @@ def prime_factors(int n, bint unique=False):
     else:
         return factors
 
-cpdef double haversine(double theta) except -1:
+cdef class Haversine:
     """
     compute the haversine function of an angle θ
 
     formula haversine function:
     haversine(θ) = sin^2(θ/2) = (1 - cos(θ)) / 2
 
-    Parameter:
-        theta (double): angle in radian
+    Attribute:
+        theta (double): angle in radian passed during initialization
 
-    Return:
-        (double): value of haversine(theta)
+    Methods
+        compute(self) (double): compute haversine(theta)
+        get_theta(self) (double): get current theta value
+        set_theta(self, double new_theta): set new angle in raadians
 
     Example:
-    >>> haversine(0)
+    >>> h = Haversine(0)
+    >>> h.compute()
     0.0
-    >>> haversine(3.14)
-    1.0
+    >>> import math
+    >>> h.set_theta(math.pi / 2)
+    >>> h.compute()
+    0.5
     """
-    # cosine based definition for avoiding compute square root or power
-    return (1.0 - cos(theta)) / 2.0
+    cdef double theta
+
+    def __cinit__(self, double theta):
+        """
+        constructor for haversine class
+
+        called once when object is created
+
+        Parameter:
+            theta (double): angle in radians - must be numeric float or double
+        """
+        self.theta = theta
+
+    def __dealloc__(self):
+        """
+        currently empty because no dynamic memory allocation
+        is used
+        """
+        pass
+
+    cpdef double compute(self):
+        """
+        compute haversine function
+        
+        Return:
+            (double): value of haversine(theta) = (1 - cos(theta)) / 2
+        """
+        # cosine based definition for avoiding compute square root or power
+        return (1.0 - cos(self.theta)) / 2.0
+
+    def get_theta(self):
+        """
+        get the current angle stored in the haversine instance
+        usefull for debug or chaining operations
+        
+        Return:
+            (double): current theta (in radians)
+        """
+        return self.theta
+
+    def set_theta(self, double new_theta):
+        """
+        update internal angle theta
+
+        allow reuse of same object for multiple computation
+
+        Parameter:
+            new_theta (double): new angle in radians
+        """
+        self.theta = new_theta
 
 cpdef double gamma(double point):
     """

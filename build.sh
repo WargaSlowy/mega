@@ -13,8 +13,8 @@ make_as_package() {
 clean_project() {
   echo "clean project"
   find . -type d -name "__pycache__" -exec rm -rf {} +
-  echo "cleaning build folders"
-  rm -rf build
+  echo "cleaning build folders egg info"
+  rm -rf mega.egg-info build
 }
 
 testing_package() {
