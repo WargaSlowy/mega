@@ -25,65 +25,96 @@
 
 from libc.math cimport pow, sqrt
 
-cpdef long sigma_z(int n, int z) except -1:
-    """
-    compute the generalized σ_z(n), summary z-th powers of all positive division
+cdef class SigmaZ:
+    """    
+    Compute the generalized σ_z(n), summary z-th powers of all positive division
 
-    formula
+    Formula:
     σ_z(n) = Σ_{d | n} d^z
 
-    Parameter:
-        n (int): positive integer whose divisor powers are to be summed
-        z (int): non-negative integer exponent applied to each divisor
+    Special case:
+        - wehn z == 0 -> sigma_z(n) return number of divisor (τ(n))
+        - when z == 1 -> sigma_z(n) = summary all divisor d of n sums d^z
 
-    Return:
-        (long): value of σ_z(n)
+    Attribute:
+        n (int): input number
+        z (int): exponent used in computation
 
     Example:
-    >>> sigma_z(6, 0)
+    >>> sig = SigmaZ(6, 0)
+    >>> sig.compute()
     4
-    >>> sigma_z(6, 2)
-    50
     """
-    if n <= 0:
-        raise ValueError("only acc positive integers")
-    if z < 0:
-        raise ValueError("exponent zeta must non-integers")
+    cdef int n
+    cdef int z
 
-    if not isinstance(n, int) and not isinstance(z, int):
-        raise TypeError("zeta and num must be int")
+    def __cinit__(self, int n, int z):
+        """
+        constructor that validating input before storing value
 
-    cdef long total = 0 # store cumulative sum d^z
-    cdef int i = 1 # current div candidate
-    cdef int limit = <int>sqrt(n) # optimization: loop up to sqrt(n)
-    cdef int oth_div # matching "other" divisor: n // i
-    cdef long power_i, power_oth # current pow and other div
+        Raise:
+            ValueError: if n <= 0 or z 0
 
-    # raise all div to 0th power (wich equal to 1), count them
-    if z == 0:
-        while i * i <= n:
-            if n % 1 == 0:
-                oth_div = n // i
+        Example:
+        >>> s = SigmaZ(6, 2)
+        """
+        if n <= 0:
+            raise ValueError("only acc positive integer")
+        if z < 0:
+            raise ValueError("exponent must be non-negative")
+
+        self.n = n
+        self.z = z
+
+    def __dealloc__(self):
+        pass
+
+    cpdef long compute(self):
+        """
+        compute σ_z(n), the sum of the z-th powers of all positive divisors of n
+
+        Return:
+            (long): computed value of σ_z(n)
+        """
+        cdef long total = 0
+        cdef int i = 1
+        cdef int limit = <int>sqrt(self.n)
+        cdef int oth_div
+        cdef long power_i, power_oth
+
+        # σ₀(n) count the number of positive divisor of n
+        if self.z == 0:
+            while i * i <= self.n:
+                if self.n % i == 0:
+                    oth_div = self.n // i
+                    if i == oth_div:
+                        total += 1 # perfect square: count once
+                    else:
+                        total += 2 # two distrint divisor: i and oth_div
+                i += 1
+            return total
+
+        # σ_z(n) = Σ d^z over all d dividing n
+        while i * i <= self.n:
+            if self.n % i == 0:
+                oth_div = self.n // i
+                
+                # compute power using pow
+                power_i = <long>(pow(i, self.z))
+                power_oth = <long>(pow(oth_div, self.z))
+
                 if i == oth_div:
-                    total += 1 # perfect square: just only add once
+                    total += power_i
                 else:
-                    total += 2 # two distinct div: i and oth_div
+                    total += power_i + power_oth
             i += 1
         return total
-    
-    # for each div pair, and compute i^z + oth_div^z
-    while i * i <= n:
-        if n % i == 0:
-            oth_div = n // i
-            # compute the z-th power of both div using fast pow()
-            power_i = <long>(pow(i, z))
-            power_oth = <long>(pow(oth_div, z))
-            if i == oth_div:
-                total += power_i # only one div (perfect square)
-            else:
-                total += power_i + power_oth # add both divisor powers
-        i += 1
-    return total
+
+    def __repr__(self):
+        """
+        Return string representation of the object
+        """
+        return f"SigmaZ({self.n}, {self.z}) = {SigmaZ(self.n, self.z).compute()}"
 
 cpdef int euler_phi(int n) except -1:
     """
