@@ -1,4 +1,5 @@
 import math
+import mega
 import mega.op.function as function
 import pytest
 
@@ -44,13 +45,13 @@ JORDAN_TOTIEN_VALUE: list = [
 def test_small_theta_haversine() -> None:
     theta: float = 0.001
     expected: float = (1.0 - math.cos(theta)) / 2.0
-    result = function.Haversine(theta).compute()
+    result = mega.Haversine(theta).compute()
     assert abs(result - expected) < 1e-3
 
 def test_negative_angle_haversine() -> None:
     theta: float = -math.pi / 2
-    result_neg: float = function.Haversine(theta).compute()
-    result_pos: float = function.Haversine(-theta).compute()
+    result_neg: float = mega.Haversine(theta).compute()
+    result_pos: float = mega.Haversine(-theta).compute()
     assert abs(result_neg - result_pos) < 1e-12
 
 def test_haversine_with_earth_distance_formula() -> None:
@@ -58,7 +59,7 @@ def test_haversine_with_earth_distance_formula() -> None:
         R: float = 6371.0
         dlat = math.radians(lat2 - lat1)
         dlon = math.radians(lon2 - lon1)
-        a = function.Haversine(dlat).compute() + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * function.Haversine(dlon).compute()
+        a = mega.Haversine(dlat).compute() + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * mega.Haversine(dlon).compute()
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
         return R * c
 
@@ -67,19 +68,19 @@ def test_haversine_with_earth_distance_formula() -> None:
 
 def test_value_gamma() -> None:
     for point, expected in GAMMA_VALUE:
-        result = function.gamma(point)
+        result = mega.Gamma(point).compute()
         assert abs(result - expected) < 1e-5, (
             f"gamma({point}) = {result}, expected {expected}"
         )
 
 def test_integer_input_gamma() -> None:
-    assert function.gamma(6) == pytest.approx(120.0, rel=1e-3)
-    assert function.gamma(7) == pytest.approx(720.0, rel=1e-10)
+    assert mega.Gamma(6).compute() == pytest.approx(120.0, rel=1e-3)
+    assert mega.Gamma(7).compute() == pytest.approx(720.0, rel=1e-10)
 
 def test_reflection_gamma() -> None:
     z: float = 1.0 / 3.0
     expected = math.pi / math.sin(math.pi * z)
-    result = function.gamma(z) * function.gamma(1.0 - z)
+    result = mega.Gamma(z).compute() * mega.Gamma(1.0 - z).compute()
     assert abs(result - expected) < 1e-10
 
 def test_value_jordan_totient() -> None:

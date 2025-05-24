@@ -144,106 +144,71 @@ cdef class Haversine:
         """
         self.theta = new_theta
 
-cpdef double gamma(double point):
-    """
-    computing gamma function Γ(point) for real-valued `point > 0`
+    def __repr__(self):
+        return f"Haversine(self.theta) = {Haversine(self.theta).compute()}"
 
-    implement using lanczos approximation which providing an efficient and
-    accurate way to compute Γ(z) for non-integer values
+cdef class Gamma:
+    cdef double z
+    cdef double[8] LANCZOS_COEFF
+    cdef double point
+    cdef dict cache
 
-    Parameter:
-        point (double): real number greater than zero at which to evaluate  gamma function
+    def __cinit__(self, double point):
+        self.LANCZOS_COEFF = [
+            676.5203681218851,
+            -1259.1392167224028,
+            771.32342877765313,
+            -176.61502916214059,
+            12.507343278686905,
+            -0.13857109526572012,
+            9.9843695780195716e-6,
+            1.5056327351493116e-7
+        ]
+        if point <= 0:
+            raise ValueError("only positive real number acc")
+        if point > 175.5:
+            raise OverflowError("currently input to large for computation")
 
-    Return:
-        (double): value of the gamma function at `gamma`
+        self.point = point
 
-    Note:
-        - Γ(0.5) = √π ≈ 1.77245385091
-        - Γ(1.0) = 1
-        - Γ(2.0) = 1
+    cpdef double compute(self):
+        cdef int i
+        cdef double z = self.point
+        cdef double y = z
+        cdef double x = 0.99999999999980993
+        cdef int neg = 0
 
-    Example:
-    >>> gamma(0.5)
-    1.77245385091
+        if self.point == 0.5:
+            return SQRT_PI
+
+        if self.point == 1.0 or self.point == 2.0:
+            return 1.0
+
+        cdef int n = <int>self.point
+        cdef long result
+        if self.point == n:
+            result = 1
+            for i in range(2, n):
+                result *= i
+            return <double>result
+
+        if z < 0.5:
+            y = 1.0 - z
+            neg = 1
+        
+        for i in range(8):
+            x += self.LANCZOS_COEFF[i] / (y + i)
+
+        cdef double t = y + 7.5
+        cdef double tmp = sqrt(2.0 * PI_NUMBER) * x * pow(t, y - 0.5) * exp(-t)
+        if neg:
+            return PI_NUMBER / (sin(PI_NUMBER * z) * tmp)
+        else:
+            return tmp
     
-    >>> gamma(5.0)
-    24.0
-
-    Reference:
-     - https://en.wikipedia.org/wiki/Gamma_function
-     - https://en.wikipedia.org/wiki/Lanczos_approximation
-    """
-    cdef double z = point
-    cdef double x, y, t, tmp, fact
-    cdef int i, n
-    cdef int neg = 0
-
-    if point <= 0:
-        raise ValueError("point must be bigger than zero")
-    if point > 175.5:
-        raise OverflowError("input value too large, will be OverflowError")
-
-    # special case
-    if point == 0.5:
-        return SQRT_PI
-
-    if point == 1.0 or point == 2.0:
-        return 1.0
-
-    # factorial shorcut for exact integer input
-    if z == <int>z:
-        n  = <int>z;
-        fact = 1.0
-        for i in range(2, n):
-            fact *= i
-        return fact
-
-    # duplicate check to avoid confusion
-    if point == int(point):
-        n = <int>point
-        result = 1.0
-        for i in range(2, n):
-            result *= i
-        return result
-
-    # reset working variable
-    z = point
-    y = z
-    
-    # apply reflection formula
-    # this allow to compute (for small value)
-    neg = 0
-    if z < 0.5:
-        y = 1.0 - z
-        neg = 1
-    else:
-        y = z
-
-    x = 0.99999999999980993
-
-    # coefficient from lanczos approximation with g=7 and n=8 terms
-    # theres are precomputed to balance accuracy and performance
-    cdef double[8] LANCZOS_COEFF = [
-        676.5203681218851,
-        -1259.1392167224028,
-        771.32342877765313,
-        -176.61502916214059,
-        12.507343278686905,
-        -0.13857109526572012,
-        9.9843695780195716e-6,
-        1.5056327351493116e-7
-    ]
-    
-    # accumulate terms of the series
-    for i in range(8):
-        x += LANCZOS_COEFF[i] / (y + i)
-    # compute intermediate value for the final formula
-    t = y + 7.5
-    tmp = sqrt(2.0 * PI_NUMBER) * x * pow(t, y - 0.5) * exp(-t)
-    # apply reflection formula if needed
-    if neg:
-        return PI_NUMBER / (sin(PI_NUMBER * z) * tmp)
-    return tmp
+    def __repr__(self):
+        return f"Gamma({self.point}) = {Gamma(self.point).compute()}"
+            
 
 cpdef long jordan_totient(int n, int k) except -1:
     """

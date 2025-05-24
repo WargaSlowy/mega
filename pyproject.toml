@@ -12,6 +12,5 @@ dependencies = [
     "numpy>=2.2.6",
     "pre-commit>=4.2.0",
     "pytest>=8.3.5",
-    "scipy>=1.15.3",
     "setuptools>=80.7.1",
 ]
