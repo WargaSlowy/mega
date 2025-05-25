@@ -13,9 +13,6 @@ make_as_package() {
 clean_project() {
   echo "clean project"
   find . -type d -name "__pycache__" -exec rm -rf {} +
-  find . -type f -name "*.so" -exec rm -rf {} +
-  find . -type f -name "*.c" -exec rm -rf {} +
-  find . -type f -name "*.h" -exec rm -rf {} +
   echo "cleaning build folders egg info"
   rm -rf mega.egg-info build
 }

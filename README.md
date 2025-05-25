@@ -5,6 +5,15 @@
 
 Python package for perform curated arithmetic calculation with __Cython__. this project was inspired with math (theory) and implementing on python library. this package using cython for speed up calculation and more optiomal and faster code.
 
+## Install package
+
+Currently `mega` not available or registered on official pip , you can directly install mega with `pip install git+` parameter
+
+```bash
+pip install git+https://github.com/WargaSlowy/mega
+# adding --break-sytem-packages if you want to install globally
+```
+
 ## Build Package
 
 > [!NOTE]  

@@ -26,7 +26,7 @@
 from mega.utils.constant cimport PI_NUMBER, SQRT_PI
 from libc.math cimport sqrt, exp, sin, pow, cos
 
-def prime_factors(int n, bint unique=False):
+def prime_factors(int n, bint unique=False) -> list[int]:
     """"
     return prime factor of positive integer n
 
@@ -95,7 +95,7 @@ cdef class Haversine:
     """
     cdef double theta
 
-    def __cinit__(self, double theta):
+    def __cinit__(self, double theta) -> None:
         """
         constructor for haversine class
 
@@ -106,7 +106,7 @@ cdef class Haversine:
         """
         self.theta = theta
 
-    def __dealloc__(self):
+    def __dealloc__(self) -> None:
         """
         currently empty because no dynamic memory allocation
         is used
@@ -133,7 +133,7 @@ cdef class Haversine:
         """
         return self.theta
 
-    def set_theta(self, double new_theta):
+    def set_theta(self, double new_theta) -> None:
         """
         update internal angle theta
 
@@ -144,7 +144,7 @@ cdef class Haversine:
         """
         self.theta = new_theta
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Haversine(self.theta) = {Haversine(self.theta).compute()}"
 
 cdef class Gamma:
@@ -153,7 +153,7 @@ cdef class Gamma:
     cdef double point
     cdef dict cache
 
-    def __cinit__(self, double point):
+    def __cinit__(self, double point) -> None:
         self.LANCZOS_COEFF = [
             676.5203681218851,
             -1259.1392167224028,
@@ -206,7 +206,7 @@ cdef class Gamma:
         else:
             return tmp
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Gamma({self.point}) = {Gamma(self.point).compute()}"
 
 
@@ -237,7 +237,7 @@ cdef class JordanTotient:
     cdef int n, k
     cdef dict _cache
 
-    def __cinit__(self, int n, int k):
+    def __cinit__(self, int n, int k) -> None:
         """
         initialize JordanTotient class
 
@@ -254,16 +254,16 @@ cdef class JordanTotient:
         self.k = k
         self._cache = {}
 
-    def __dealloc__(self):
+    def __dealloc__(self) -> None:
         self._cache.clear()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         return string representation of the object
         """
         return f"JordanTotient({self.n}, {self.k})"
 
-    def __getitem__(self, tuple key):
+    def __getitem__(self, tuple key) -> None:
         """
         custom indexing for precomputed value
 
@@ -287,7 +287,7 @@ cdef class JordanTotient:
         self._cache[(n_key, k_key)] = result
         return result
 
-    def __setitem__(self, tuple key, long value):
+    def __setitem__(self, tuple key, long value) -> None:
         """
         manual cache value for faster future lookup
 
