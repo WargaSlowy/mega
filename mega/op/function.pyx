@@ -208,52 +208,121 @@ cdef class Gamma:
     
     def __repr__(self):
         return f"Gamma({self.point}) = {Gamma(self.point).compute()}"
-            
 
-cpdef long jordan_totient(int n, int k) except -1:
+
+cdef class JordanTotient:
     """
-    compute jordan totient function which generalizes euler totient function
+    compute jordan totient function
 
-    Parameter:
-        n (int): positive integer 
-        k (int): non-negative integer exponent
+    Jordan totient generalizae euler totient function and formula
+    defined as:
 
-    Return:
-        (long): value of totient function
+    Jₖ(n) = nᵏ × ∏(p|n) [1 - 1/pᵏ] = nᵏ × ∏(p|n) (pᵏ - 1)/pᵏ
+
+    Attribute:
+        n (int): number for which to compute the jordan totient
+        k (int): exponent applied each div in the formula
+
+    Methods:
+        compute(): compute jordan totient based on stored value
+        ___repr__(): string representation for debug
+        __getitem__(): allow indexing like dictionary
+        __setitem__(): manual cache value
 
     Example:
-    >>> jordan_totient(6, 1)
+    >>> jt = JordanTotient(6, 1)
+    >>> jt.compute()
     2
-    >>> jordan_totient(10, 2)
-    80
     """
-    if n <= 0:
-        raise ValueError("input `n` must positive integers")
-    if k < 0:
-        raise ValueError("exponent `k` must non-negative integer")
+    cdef int n, k
+    cdef dict _cache
 
-    if k == 0:
-        return 0
+    def __cinit__(self, int n, int k):
+        """
+        initialize JordanTotient class
 
-    if n == 1:
-        return 1
+        Parameter:
+            n (int): must be >= 1 - domain of jordan function
+            k (int): exponent
+        """
+        if n <= 0:
+            raise ValueError("only positive integers are accepted for n")
+        if k < 0:
+            raise ValueError("exponent k must be non-negative")
 
-    # acompute n^k
-    cdef long res = <long>(pow(n, k))
-    # get unique prime factor of n
-    cdef list primes = prime_factors(n)
-    # apply the formula for each prime factor
-    cdef int p
-    cdef long pk, numerator, denominator
+        self.n = n
+        self.k = k
+        self._cache = {}
 
-    for p in primes:
-        # compute p^k
-        pk = <long>(pow(p, k))
-        # compute (p^k - 1) / p^k as two separate integer operations
-        numerator = pk - 1
-        denominator = pk
-        # multiply result by numerator / denominator using integer
-        # arithmetic to make sure division happens before multiplication
-        # to preventing overflow
-        res = res // denominator * numerator
-    return res
+    def __dealloc__(self):
+        self._cache.clear()
+
+    def __repr__(self):
+        """
+        return string representation of the object
+        """
+        return f"JordanTotient({self.n}, {self.k})"
+
+    def __getitem__(self, tuple key):
+        """
+        custom indexing for precomputed value
+
+        Parameter:
+            key (tuple): should be (n, k)
+
+        Return:
+            (long): precomputed value if available
+        """
+        if not isinstance(key, tuple) or len(key) != 2:
+            raise TypeError("key must be tuple of (n, k)")
+
+        n_key, k_key = key
+
+        if (n_key, n_key) in self._cache:
+            return self._cache[(n_key, k_key)]
+
+        # create new instance to compute
+        temp = JordanTotient(n_key, k_key)
+        result = temp.compute()
+        self._cache[(n_key, k_key)] = result
+        return result
+
+    def __setitem__(self, tuple key, long value):
+        """
+        manual cache value for faster future lookup
+
+        Parameter:
+            key (tuple): (n, k)
+            value (long): precomputed value to store
+        """
+        if not isinstance(key, tuple) or len(key) != 2:
+            raise TypeError("key must be tuple of (n, k)")
+        self._cache[key] = value
+
+    cpdef long compute(self):
+        """
+        this method implement jordan totient function
+        - for small n, using trial division and product over distinct primes
+        - for k = 0 return 0
+        - general case, compute n^k and applies the formula
+
+        Return:
+            (long): value of jordan totient
+        """
+        if self.k == 0:
+            return 0
+        if self.n == 1:
+            return 1
+
+        cdef long res = <long>(pow(self.n, self.k))
+        cdef list primes = prime_factors(self.n)
+
+        cdef int p
+        cdef long pk, numerator, denominator
+
+        for p in primes:
+            pk = <long>pow(p, self.k)
+            numerator = pk - 1
+            denominator = pk
+            res = res // denominator * numerator
+        return res

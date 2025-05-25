@@ -1,6 +1,5 @@
 import math
 import mega
-import mega.op.function as function
 import pytest
 
 HAVERSINE_VALUE: dict = {
@@ -85,13 +84,13 @@ def test_reflection_gamma() -> None:
 
 def test_value_jordan_totient() -> None:
     for n, k, expected in JORDAN_TOTIEN_VALUE:
-        result = function.jordan_totient(n, k)
-        assert result == expected, f"jordan_totient({n}, {k}) = {result}, expected = {expected}"
+        result = mega.JordanTotient(n, k).compute()
+        assert result == expected, f"JordanTotient({n}, {k}) = {result}, expected = {expected}"
 
 def test_k_zero_jordan_totient() -> None:
     for n in range(1, 21):
-        assert function.jordan_totient(n, 0) == 0
+        assert mega.JordanTotient(n, 0).compute() == 0
 
 def test_large_input_jordan_totient() -> None:
-    assert function.jordan_totient(100, 2) == 5184
-    assert function.jordan_totient(12, 2) == 72
+    assert mega.JordanTotient(100, 2).compute() == 5184
+    assert mega.JordanTotient(12, 2).compute() == 72
