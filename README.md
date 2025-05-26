@@ -37,5 +37,11 @@ uv pip install -e .
 import mega.op.function as function
 
 number: float = 5.2
-print(function.gamma(number))
+gamma_function = mega.GammaZ(number)
+print(gamma_function.compute())
 ```
+
+## benchmark information
+
+**Sigma Function**
+![sigma_z_benchmark](test/sigma_z_benchmark_vertical.png)

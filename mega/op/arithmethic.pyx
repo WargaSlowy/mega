@@ -114,7 +114,7 @@ cdef class SigmaZ:
         """
         Return string representation of the object
         """
-        return f"SigmaZ({self.n}, {self.z}) = {SigmaZ(self.n, self.z).compute()}"
+        return f"SigmaZ({self.n}, {self.z})"
 
 cdef class EulerPhi:
     """
@@ -238,3 +238,5 @@ cdef class EulerPhi:
 
     def __repr__(self):
         return f"EulerPhi({self.n})"
+
+
