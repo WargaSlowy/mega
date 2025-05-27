@@ -7,7 +7,7 @@ def run_test() -> None:
     if len(sys.argv) > 1:
         test_files = sys.argv[1:]
     else:
-        test_files = ["arithmetic_test.py" ,"constant_test.py", "function_test.py"]
+        test_files = ["arithmetic_test.py" ,"constant_test.py", "function_test.py", "tensor_test.py"]
 
     return_code = pytest.main(test_files + ["-v"])
 

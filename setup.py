@@ -18,6 +18,11 @@ ext = [
         ["mega/op/arithmethic.pyx"],
         include_dirs=[np.get_include()],
     ),
+    Extension(
+        "mega.op.tensor",
+        ["mega/op/tensor.pyx"],
+        include_dirs=[np.get_include()]
+    ),
 ]
 
 os.makedirs("mega/utils", exist_ok=True)

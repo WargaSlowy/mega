@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 # cython: language_level=3
-# mega/op/gamma.pyx
+# mega/op/function.pyx
 
 from mega.utils.constant cimport PI_NUMBER, SQRT_PI
 from libc.math cimport sqrt, exp, sin, pow, cos
