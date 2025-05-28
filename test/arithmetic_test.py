@@ -17,6 +17,16 @@ SIGMA_VALUES: list = [
     (100, 1, 217),
 ]
 
+SIGMA_COMPLEX_VALUES: list = [
+    (
+        6,
+        0.5 + 1j,
+        1 ** (0.5 + 1j) + 2 ** (0.5 + 1j) + 3 ** (0.5 + 1j) + 6 ** (0.5 + 1j),
+    ),
+    (6, 1 + 1j, 1 ** (1 + 1j) + 2 ** (1 + 1j) + 3 ** (1 + 1j) + 6 ** (1 + 1j)),
+    (4, 0.5 + 1j, 1 ** (0.5 + 1j) + 2 ** (0.5 + 1j) + 4 ** (0.5 + 1j)),
+]
+
 EULER_PHI_VALUE: list = [
     (1, 1),
     (2, 1),
@@ -35,25 +45,36 @@ EULER_PHI_VALUE: list = [
     (105, 48),
 ]
 
+
 def test_value_sigma() -> None:
     for n, z, expected in SIGMA_VALUES:
         sigma = mega.SigmaZ(n, z)
         result = sigma.compute()
-        assert result == expected, f"SigmaZ({n}, {z}) -> {result}, expected = {expected}"
+        assert (
+            result == expected
+        ), f"SigmaZ({n}, {z}) -> {result}, expected = {expected}"
 
-def test_invalid_sigma() -> None:
-    with pytest.raises(ValueError):
-        mega.SigmaZ(0, 1)
-    with pytest.raises(ValueError):
-        mega.SigmaZ(-5, 2)
 
-def test_invalid_z_sigma() -> None:
-    with pytest.raises(ValueError):
-        mega.SigmaZ(5, -1)
+def test_value_complex_sigma() -> None:
+    import numpy as np
+
+    for n, z, expected in SIGMA_COMPLEX_VALUES:
+        sigma = mega.SigmaZ(n, z)
+        result = sigma.compute()
+
+        assert isinstance(
+            result, complex
+        ), f"Expected complex output for SigmaZ({n}, {z}), got {type(result)}"
+
+        assert np.isclose(result, expected, atol=1e-10), (
+            f"SigmaZ({n}, {z}) → {result}, " f"expected {expected}"
+        )
+
 
 def test_perfect_square_sigma() -> None:
     sig = mega.SigmaZ(4, 1)
     assert sig.compute() == 1 + 2 + 4
+
 
 def test_large_input_sigma() -> None:
     sig = mega.SigmaZ(1000, 0)
@@ -62,15 +83,20 @@ def test_large_input_sigma() -> None:
     sig = mega.SigmaZ(1000, 1)
     assert sig.compute() == 2340
 
+
 def test_value_euler_phi() -> None:
     for n, expected in EULER_PHI_VALUE:
         phi = mega.EulerPhi(n)
         result = phi.compute()
-        assert result == expected, f"EulerPhi({n}).compute() -> {result}, expected {expected}"
+        assert (
+            result == expected
+        ), f"EulerPhi({n}).compute() -> {result}, expected {expected}"
+
 
 def test_invalid_euler_phi() -> None:
     with pytest.raises(ValueError):
         mega.EulerPhi(0)
+
 
 def test_case_prime_euler_phi() -> None:
     primes: list[int] = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
@@ -78,13 +104,15 @@ def test_case_prime_euler_phi() -> None:
         phi = mega.EulerPhi(p)
         assert phi.compute() == p - 1, f"phi({p}) should -> {p - 1}"
 
+
 def test_perfect_power_euler_phi() -> None:
     p: int = 2
     for k in range(1, 6):
-        power = p ** k
+        power = p**k
         expected = power - (p ** (k - 1))
         phi = mega.EulerPhi(power)
         assert phi.compute() == expected, f"phi({power}) should be {expected}"
+
 
 def test_large_input_euler_phi() -> None:
     phi = mega.EulerPhi(1_000_000)

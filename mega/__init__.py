@@ -1,5 +1,5 @@
 from .op.function import Gamma, Haversine, JordanTotient
-from .op.arithmethic import SigmaZ,  EulerPhi
+from .op.arithmethic import SigmaZ, EulerPhi
 from .op.tensor import Tensor
 
 # utils folders

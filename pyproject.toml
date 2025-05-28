@@ -10,7 +10,6 @@ requires-python = ">=3.13"
 dependencies = [
     "cython>=3.1.0",
     "numpy>=2.2.6",
-    "pre-commit>=4.2.0",
     "setuptools>=80.7.1",
 ]
 
@@ -18,5 +17,6 @@ dependencies = [
 dev = [
     "black>=25.1.0",
     "matplotlib>=3.10.3",
+    "pre-commit>=4.2.0",
     "pytest>=8.3.5",
 ]

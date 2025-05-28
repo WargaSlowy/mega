@@ -26,6 +26,7 @@
 from mega.utils.constant cimport PI_NUMBER, SQRT_PI
 from libc.math cimport sqrt, exp, sin, pow, cos
 
+
 def prime_factors(int n, bint unique=False) -> list[int]:
     """"
     return prime factor of positive integer n
@@ -33,7 +34,7 @@ def prime_factors(int n, bint unique=False) -> list[int]:
     Parameter:
         n (int): integer to be factorized, must greater than zero
         unique (bool): if True, return only distinct prime factors
-        
+
     Return:
         list[int]: list of prime factor of `n`, sorted in increasing order
 
@@ -47,7 +48,7 @@ def prime_factors(int n, bint unique=False) -> list[int]:
         raise ValueError("only positive integer are acc")
     cdef int i = 2
     cdef list factors = []
-    
+
     # trie division algorithm
     while i * i <= n:
         while n % i == 0:
@@ -68,6 +69,7 @@ def prime_factors(int n, bint unique=False) -> list[int]:
         return [x for x in factors if not (x in seen or seen.add(x))]
     else:
         return factors
+
 
 cdef class Haversine:
     """
@@ -116,7 +118,7 @@ cdef class Haversine:
     cpdef double compute(self):
         """
         compute haversine function
-        
+
         Return:
             (double): value of haversine(theta) = (1 - cos(theta)) / 2
         """
@@ -127,7 +129,7 @@ cdef class Haversine:
         """
         get the current angle stored in the haversine instance
         usefull for debug or chaining operations
-        
+
         Return:
             (double): current theta (in radians)
         """
@@ -195,7 +197,7 @@ cdef class Gamma:
         if z < 0.5:
             y = 1.0 - z
             neg = 1
-        
+
         for i in range(8):
             x += self.LANCZOS_COEFF[i] / (y + i)
 
@@ -205,7 +207,7 @@ cdef class Gamma:
             return PI_NUMBER / (sin(PI_NUMBER * z) * tmp)
         else:
             return tmp
-    
+
     def __repr__(self) -> str:
         return f"Gamma({self.point}) = {Gamma(self.point).compute()}"
 

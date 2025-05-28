@@ -2,7 +2,7 @@
 
 make_libs () {
   echo "make project"
-  uv run setup.py build_ext --inplace;
+  uv run setup.py build_ext --inplace
 }
 
 make_as_package() {

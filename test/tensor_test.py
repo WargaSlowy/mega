@@ -1,6 +1,7 @@
 import mega
 import pytest
 
+
 def test_dtype_support_tensor() -> None:
     t_int = mega.Tensor((2, 2), dtype="int")
     t_long = mega.Tensor((2, 2), dtype="long")
@@ -12,9 +13,11 @@ def test_dtype_support_tensor() -> None:
     assert t_float.dtype() == "float"
     assert t_double.dtype() == "double"
 
+
 def test_invalid_dtype_value_error_tensor() -> None:
     with pytest.raises(ValueError):
         mega.Tensor((2, 2), dtype="str")
+
 
 def test_invalid_dimension_size_tensor() -> None:
     with pytest.raises(ValueError):
@@ -22,16 +25,19 @@ def test_invalid_dimension_size_tensor() -> None:
     with pytest.raises(ValueError):
         mega.Tensor((-1, 3))
 
+
 def test_initial_data_int_tensor() -> None:
     data: list[int] = [1, 2, 3, 4]
     tensor = mega.Tensor((4,), data=data, dtype="int")
     assert tensor[0] == 1
     assert tensor[3] == 4
 
+
 def test_initial_data_long_tensor() -> None:
     data: list[int] = [10, 20, 30]
     tensor = mega.Tensor((3,), data=data, dtype="long")
     assert tensor[1] == 20
+
 
 def test_indexing_1d_tensor() -> None:
     tensor = mega.Tensor((5,), dtype="long")
@@ -39,6 +45,7 @@ def test_indexing_1d_tensor() -> None:
     tensor[4] = 200
     assert tensor[0] == 100
     assert tensor[4] == 200
+
 
 def test_indexing_2d_tensor() -> None:
     tensor = mega.Tensor((2, 3), dtype="long")
@@ -51,6 +58,7 @@ def test_indexing_2d_tensor() -> None:
     assert tensor[0, 1] == 2
     assert tensor[1, 2] == 6
 
+
 def test_indexing_3d_tensor() -> None:
     tensor = mega.Tensor((2, 2, 2), dtype="long")
     tensor[0, 0, 0] = 1
@@ -59,10 +67,12 @@ def test_indexing_3d_tensor() -> None:
     assert tensor[0, 0, 0] == 1
     assert tensor[1, 1, 1] == 8
 
+
 def test_out_of_bound_indexing_tensor() -> None:
     tensor = mega.Tensor((3,), dtype="long")
     with pytest.raises(IndexError):
         _ = tensor[3]
+
 
 def test_repr_tensor() -> None:
     tensor = mega.Tensor((5,), dtype="long")

@@ -19,9 +19,7 @@ ext = [
         include_dirs=[np.get_include()],
     ),
     Extension(
-        "mega.op.tensor",
-        ["mega/op/tensor.pyx"],
-        include_dirs=[np.get_include()]
+        "mega.op.tensor", ["mega/op/tensor.pyx"], include_dirs=[np.get_include()]
     ),
 ]
 

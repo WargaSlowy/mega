@@ -46,9 +46,9 @@ cdef class SigmaZ:
     4
     """
     cdef int n
-    cdef int z
+    cdef object z
 
-    def __cinit__(self, int n, int z):
+    def __cinit__(self, int n, object z):
         """
         constructor that validating input before storing value
 
@@ -60,8 +60,12 @@ cdef class SigmaZ:
         """
         if n <= 0:
             raise ValueError("only acc positive integer")
-        if z < 0:
-            raise ValueError("exponent must be non-negative")
+        if isinstance(z, (float, int)):
+            self.z = <double>z
+        elif isinstance(z, complex):
+            self.z = z
+        else:
+            raise TypeError("exponent must be numeric")
 
         self.n = n
         self.z = z
@@ -69,47 +73,71 @@ cdef class SigmaZ:
     def __dealloc__(self):
         pass
 
-    cpdef long compute(self):
+    cpdef object compute(self):
         """
         compute σ_z(n), the sum of the z-th powers of all positive divisors of n
 
         Return:
             (long): computed value of σ_z(n)
         """
-        cdef long total = 0
         cdef int i = 1
-        cdef int limit = <int>sqrt(self.n)
         cdef int oth_div
-        cdef long power_i, power_oth
-
-        # σ₀(n) count the number of positive divisor of n
+        cdef double power_i, power_oth
+        cdef double z_real
+        cdef complex z_complex
+        cdef long total_real = 0
+        
+        # when z == 0, just counting number of divisor
         if self.z == 0:
+            total_real = 0
             while i * i <= self.n:
                 if self.n % i == 0:
                     oth_div = self.n // i
                     if i == oth_div:
-                        total += 1 # perfect square: count once
+                        total_real += 1 # perfect square
                     else:
-                        total += 2 # two distrint divisor: i and oth_div
+                        total_real += 2 # two distinct divisor
                 i += 1
-            return total
+            return total_real
 
-        # σ_z(n) = Σ d^z over all d dividing n
+        # try convert z to double for optimal compute
+        try:
+            z_real = <double>self.z
+        except TypeError:
+            z_real = -1.0 # mark as invalid for fallback logic
+
+        # if z is numeric and >= 0
+        if z_real >= 0:
+            total_real = 0
+            while i * i <= self.n:
+                if self.n % i == 0:
+                    oth_div = self.n // i
+                    power_i_real = <long>(pow(i, z_real))
+                    power_oth_real = <long>(pow(oth_div, z_real))
+
+                    if i == oth_div:
+                        total_real += power_i_real # add once for perfect square
+                    else:
+                        total_real += power_i_real + power_oth_real
+                i += 1
+            return total_real
+
+
+        import numpy as np
+        z_complex = self.z
+        total_complex = 0j
+
+        # same loop structure, using numpy for complex support
         while i * i <= self.n:
             if self.n % i == 0:
                 oth_div = self.n // i
-                
-                # compute power using pow
-                power_i = <long>(pow(i, self.z))
-                power_oth = <long>(pow(oth_div, self.z))
-
-                if i == oth_div:
-                    total += power_i
-                else:
-                    total += power_i + power_oth
+                total_complex += np.power(i, z_complex)
+                if i != oth_div:
+                    total_complex += np.power(oth_div, z_complex)
             i += 1
-        return total
 
+        return total_complex
+       
     def __repr__(self):
         """
         Return string representation of the object
