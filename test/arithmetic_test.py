@@ -1,5 +1,6 @@
 import mega
 import pytest
+import math
 
 SIGMA_VALUES: list = [
     (1, 0, 1),
@@ -43,6 +44,16 @@ EULER_PHI_VALUE: list = [
     (48, 16),
     (100, 40),
     (105, 48),
+]
+
+CHEBYSHEV_VALUE: list = [
+    (2.0, math.log(2)),
+    (3.0, math.log(2) + math.log(3)),
+    (5.0, math.log(2) + math.log(3) + math.log(5)),
+    (7.0, sum(math.log(p) for p in [2, 3, 5, 7])),
+    (10.0, sum(math.log(p) for p in [2, 3, 5, 7])),
+    (11.0, sum(math.log(p) for p in [2, 3, 5, 7, 11])),
+    (20.0, sum(math.log(p) for p in [2, 3, 5, 7, 11, 13, 17, 19])),
 ]
 
 
@@ -117,3 +128,57 @@ def test_perfect_power_euler_phi() -> None:
 def test_large_input_euler_phi() -> None:
     phi = mega.EulerPhi(1_000_000)
     assert phi.compute() == 400_000
+
+
+def test_value_chebyshev() -> None:
+    for x, expected in CHEBYSHEV_VALUE:
+        ch = mega.Chebyshev(x)
+        result = ch.compute()
+        assert result == pytest.approx(expected, abs=1e-5), f"Chebyshev({x}).compute()"
+
+
+def test_edge_cases_chebyshev() -> None:
+    res = mega.Chebyshev(10.9)
+    assert res.compute() == pytest.approx(
+        sum(math.log(p) for p in [2, 3, 5, 7]), abs=1e-10
+    )
+
+
+def test_setitem_manual_cache_chebyshev() -> None:
+    res = mega.Chebyshev(10.0)
+    res[10] = 5.3471
+    assert res[10] == 5.3471
+
+
+def test_large_input_chebyshev() -> None:
+    res = mega.Chebyshev(100.0)
+    prime = [
+        2,
+        3,
+        5,
+        7,
+        11,
+        13,
+        17,
+        19,
+        23,
+        29,
+        31,
+        37,
+        41,
+        43,
+        47,
+        53,
+        59,
+        61,
+        67,
+        71,
+        73,
+        79,
+        83,
+        89,
+        97,
+    ]
+    expected = sum(math.log(p) for p in prime)
+    res_ch = res.compute()
+    assert res_ch == pytest.approx(expected, abs=1e-5)

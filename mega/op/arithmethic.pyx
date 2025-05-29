@@ -23,7 +23,7 @@
 # cython: language_level=3
 # mega/op/arithmetic.pyx
 
-from libc.math cimport pow, sqrt
+from libc.math cimport pow, sqrt, log
 
 cdef class SigmaZ:
     """    
@@ -267,4 +267,98 @@ cdef class EulerPhi:
     def __repr__(self):
         return f"EulerPhi({self.n})"
 
+cdef class Chebyshev:
+    """
+    compute chebyshev function ϑ(x), with formula:
 
+    ϑ(x) = Σ_{p ≤ x} log(p)
+
+    Attribute:
+        x (double): upper bound of summation
+
+    Methods:
+        compute(): compute ϑ(x) using trial division
+        __repr__(): representation of chebyshev function
+        __getitem__(key): retrieve cache value or compute it
+        __setitem__(key, value): manually cache a compute result
+
+    Example:
+    >>> cheb = Chebyshev(10.0)
+    >>> cheb.compute()
+    5.347107530637821
+    """
+    cdef public double x
+    cdef dict _cache
+
+    def __cinit__(self, double x):
+        """
+        initialize chebyshev instance with input validation
+
+        Parameter:
+            x (double): must be >= 2
+        """
+        if x < 2:
+            raise ValueError("x must be >= 2")
+        self.x = x
+        self._cache = {}
+
+    def __dealloc__(self):
+        self._cache.clear()
+
+    cpdef double compute(self):
+        """
+        compute the first chebyshev function
+
+        this method using trial divison to check primality
+        then accumulate log(p) for each prime <= floor(x)
+
+        Return:
+            (double): result of chebyshev functon
+        """
+        cdef double result = 0.0
+        cdef int i = 2
+        cdef int limit = <int>self.x
+        cdef int j, is_prime
+
+        while i <= limit:
+            is_prime = 1
+            for j in range(2, <int>sqrt(i) + 1):
+                if i % j == 0:
+                    is_prime = 0
+                    break
+            if is_prime:
+                result += log(i)
+            i += 1
+        return result
+ 
+    def __getitem__(self, double key):
+        """
+        retrieve chebyshev function from internal cache, or compute
+        and store it
+
+        Parameter:
+            key (double): positive number >= 2
+
+        Return:
+            (double): Chebyshev(key)
+        """
+        if key in self._cache:
+            return self._cache[key]
+        temp = Chebyshev(key)
+        result = temp.compute()
+        self._cache[key] = result
+        return result
+
+    def __setitem__(self, double key, double value):
+        """
+        manually set cached value for chebyshev(key)
+
+        Parameter:
+            key(double): positive number >= 2
+            value(doube): precomputed value of chebyshev(key)
+        """
+        self._cache[key] = value
+
+    
+    def __repr__(self):
+        return f"Chebyshev(x={self.x})"
